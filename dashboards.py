@@ -28,5 +28,25 @@ df_filtred = df[
 st.dataframe(df_filtred)
 
 # Cria um gráfico de exemplo usando os dados filtrados (substitua pelas suas colunas reais)
-fig = px.bar(df_filtred, x='data_fato', y='furto', title='Título do Gráfico', color='cia_pm', )
+fig = px.bar(df_filtred, x='data_fato', y='furto', title='Título do Gráfico', color='cia_pm',)
 st.plotly_chart(fig)
+
+# Cria uma nova coluna que seja a soma das colunas 'furto', 'roubo' e 'extorsao'
+df_filtred['total_crimes'] = df_filtred[['furto', 'roubo', 'extorsao']].sum(axis=1)
+
+# Agrupa os dados por 'cia_pm' e calcula a soma de 'total_crimes'
+df_grouped = df_filtred.groupby('cia_pm')['total_crimes'].sum().reset_index()
+
+# Cria um gráfico de barras com base nos dados agrupados e adiciona rótulos
+fig = px.bar(df_filtred, x='cia_pm', y='natureza_ocorrencia_descricao_longa', title='Soma de Crimes por CIA PM', color='natureza_ocorrencia_descricao_longa', text='total_crimes')
+
+# Atualiza o layout do gráfico para mostrar os rótulos
+fig.update_traces(texttemplate='%{text:.0s}', textposition='outside')
+
+# Exibe o gráfico no Streamlit
+st.plotly_chart(fig)
+
+col1, col2 = st.columns(2)
+col3, col4, col5 = st.columns(3)
+
+col1.plotly_chart(fig)
